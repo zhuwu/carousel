@@ -50,7 +50,13 @@
                             {left: 360, top: 100, width: 360, height: 270},
                             {left: 560, top: 50, width: 320, height: 240},
                             {left: 740, top: 0, width: 280, height: 210}],
-          inactiveStyle: {zIndex: 0, left: 540, top: 0, width: 0}
+          inactiveStyle: {zIndex: 0, left: 540, top: 0, width: 0},
+          beforePrev: function(activeList) {
+            activeList[activeList.length - 1].css({left: 1020, top: 0});
+          },
+          beforeNext: function(activeList) {
+            activeList[0].css({left: 60, top: 0});
+          }
         });
       });
     </script>

@@ -139,7 +139,13 @@
       $prev.on('click', function prev(e) {
         e.preventDefault();
         $prev.off('click', prev);
-        var inactiveElementIndex = activeElementIndex + activeListCenter;
+        var inactiveElementIndex = activeElementIndex + activeListCenter,
+            wrappedAfterPrev = function() {
+              if (options.afterPrev) {
+                options.afterPrev(arguments);
+              }
+              $prev.on('click', prev);
+            };
         if (inactiveElementIndex >= carouselLength) {
           inactiveElementIndex = inactiveElementIndex - carouselLength;
         }
@@ -151,14 +157,19 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true, options.beforePrev,
-                function() {options.afterPrev(arguments); $prev.on('click', prev);});
+                inactiveStyle, inactiveClass, true, options.beforePrev, wrappedAfterPrev);
       });
 
       $next.on('click', function next(e) {
         e.preventDefault();
         $next.off('click', next);
-        var inactiveElementIndex = activeElementIndex - activeListCenter;
+        var inactiveElementIndex = activeElementIndex - activeListCenter,
+            wrapperdAfterNext = function() {
+              if (options.afterNext) {
+                options.afterNext(arguments);
+              }
+              $next.on('click', next);
+            };
         if (inactiveElementIndex < 0) {
           inactiveElementIndex = inactiveElementIndex + carouselLength;
         }
@@ -170,8 +181,7 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true, options.beforeNext,
-                function() {options.afterNext(arguments); $next.on('click', next);});
+                inactiveStyle, inactiveClass, true, options.beforeNext, wrapperdAfterNext);
 
       });
     });
