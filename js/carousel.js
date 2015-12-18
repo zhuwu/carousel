@@ -4,8 +4,8 @@
     prev: '.prev',
     next: '.next',
     activeListLength: 5,
-    activeStyleList: [],
-    activeZIndexList: [{zIndex: 2}, {zIndex: 5}, {zIndex: 10}, {zIndex: 5}, {zIndex: 2}],
+    activeStyleList: [{}, {}, {}, {}, {}],
+    activeZIndexList: [2, 5, 10, 5, 2],
     activeClassList: ['side-2', 'side-1', 'active', 'side-1', 'side-2'],
     inactiveStyle: {zIndex: 0, left: 0, top: 0, width: 0},
     inactiveClass: 'hidden'
@@ -38,7 +38,40 @@
     }
 
     return activeList;
-  }
+  };
+
+  var caculateInactiveList = function($carouselElementList, activeListLength, activeElementIndex) {
+    var activeIndexList = [],
+        activeListCenter = (activeListLength - 1)/2,
+        carouselLength = $carouselElementList.length,
+        elementIndex, $inactiveElementList;
+
+    activeIndexList[activeListCenter] = activeElementIndex;
+
+    for (var i = 0; i < activeListCenter; i++) {
+      elementIndex = activeElementIndex + activeListCenter - i;
+      if (elementIndex >= $carouselElementList.length) {
+        elementIndex = elementIndex - carouselLength;
+      }
+
+      activeIndexList[i] = elementIndex;
+    }
+
+    for (i = activeListCenter + 1; i < activeListLength; i++) {
+      elementIndex = activeElementIndex + activeListCenter - i;
+      if (elementIndex < 0) {
+        elementIndex = elementIndex + carouselLength;
+      }
+
+      activeIndexList[i] = elementIndex;
+    }
+
+    $inactiveElementList = $carouselElementList.filter(function(index) {
+      return $.inArray(index, activeIndexList) == -1;
+    });
+
+    return $inactiveElementList;
+  };
 
   var updateCarousel = function (activeList, inactiveElement, activeStyleList, activeZIndexList, activeClassList, 
           inactiveStyle, inactiveClass, hasTransition, direction) {
@@ -47,7 +80,7 @@
         $element.removeClass();
       }
 
-      $element.css(activeZIndexList[index]).addClass(activeClassList[index]);
+      $element.css({zIndex: activeZIndexList[index]}).addClass(activeClassList[index]);
 
       if (hasTransition) {
         $element.animate(activeStyleList[index]);
@@ -57,7 +90,7 @@
     });
 
     inactiveElement.removeClass().addClass(inactiveClass).css(inactiveStyle);
-  }
+  };
 
   $.fn.initCarousel = function(opts) {
     var options = $.extend({}, defaults, opts);
@@ -76,7 +109,8 @@
           inactiveStyle = options.inactiveStyle,
           inactiveClass = options.inactiveClass;
       updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
-              $(), activeStyleList, activeZIndexList, activeClassList, inactiveStyle, inactiveClass, false, '');
+              caculateInactiveList($carouselElementList, activeListLength, activeElementIndex),
+              activeStyleList, activeZIndexList, activeClassList, inactiveStyle, inactiveClass, false, '');
       $prev.on('click', function(e) {
         e.preventDefault();
         var inactiveElementIndex = activeElementIndex + activeListCenter;
@@ -112,5 +146,5 @@
 
       });
     });
-  }
+  };
 } (jQuery));

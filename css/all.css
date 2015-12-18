@@ -1,0 +1,14 @@
+* { margin: 0; padding: 0; border: 0; box-sizing: border-box; }
+body { background: #FFF; color: #000; font: 0.85em/1.6em Helvetica, Arial, sans-serif; }
+ul, ol { list-style: none; }
+
+.wrapper { min-width:1903px; max-width: 1920px; width: 100%; height: 4506px; margin: 0 auto; position: relative; }
+.hidden { display: none !important; }
+
+
+.carousel { position: relative; margin-top: 40px; }
+.carousel li { position: absolute; }
+.carousel li a, .carousel img { display: block; display: block; width: 100%; height: auto; }
+.carousel .nav a { display: block; color: #000; font-size: 40px; position: absolute; top: 180px; }
+.carousel .nav .prev { left: 10px; }
+.carousel .nav .next { left: 1030px; }
