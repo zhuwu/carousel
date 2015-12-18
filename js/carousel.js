@@ -74,7 +74,7 @@
   };
 
   var updateCarousel = function (activeList, inactiveElement, activeStyleList, activeZIndexList, activeClassList, 
-          inactiveStyle, inactiveClass, hasTransition, direction) {
+          inactiveStyle, inactiveClass, hasTransition) {
     $.each(activeList, function(index, $element) {
       if (!$element.hasClass(activeClassList[index])) {
         $element.removeClass();
@@ -125,7 +125,7 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true, 'prev');
+                inactiveStyle, inactiveClass, true);
       });
 
       $next.on('click', function(e) {
@@ -142,7 +142,7 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true, 'next');
+                inactiveStyle, inactiveClass, true);
 
       });
     });
