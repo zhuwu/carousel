@@ -8,7 +8,11 @@
     activeZIndexList: [2, 5, 10, 5, 2],
     activeClassList: ['side-2', 'side-1', 'active', 'side-1', 'side-2'],
     inactiveStyle: {zIndex: 0, left: 0, top: 0, width: 0},
-    inactiveClass: 'hidden'
+    inactiveClass: 'hidden',
+    beforePrev: null,
+    afterPrev: null,
+    beforeNext: null,
+    afterNext: null
   };
 
   var caculateActiveList = function($carouselElementList, activeListLength, activeElementIndex) {
@@ -74,7 +78,25 @@
   };
 
   var updateCarousel = function (activeList, inactiveElement, activeStyleList, activeZIndexList, activeClassList, 
-          inactiveStyle, inactiveClass, hasTransition) {
+          inactiveStyle, inactiveClass, hasTransition, beforeCallback, afterCallback) {
+    if (beforeCallback) {
+      beforeCallback(activeList, inactiveElement, activeStyleList, activeZIndexList, activeClassList, 
+              inactiveStyle, inactiveClass);
+    }
+
+    if (afterCallback) {
+      var triggerCount = 0;
+      $(document).on('carouselCallback', function trigger() {
+        triggerCount++;
+        if (triggerCount == activeList.length) {
+          $(document).off('carouselCallback', trigger);
+          triggerCount = 0;
+          afterCallback(activeList, inactiveElement, activeStyleList, activeZIndexList, activeClassList, 
+                  inactiveStyle, inactiveClass);
+        }
+      })
+    }
+
     $.each(activeList, function(index, $element) {
       if (!$element.hasClass(activeClassList[index])) {
         $element.removeClass();
@@ -83,9 +105,12 @@
       $element.css({zIndex: activeZIndexList[index]}).addClass(activeClassList[index]);
 
       if (hasTransition) {
-        $element.animate(activeStyleList[index]);
+        $element.animate(activeStyleList[index], function() {
+          $(document).trigger('carouselCallback');
+        });
       } else  {
         $element.css(activeStyleList[index]);
+        $(document).trigger('carouselCallback');
       }
     });
 
@@ -110,9 +135,10 @@
           inactiveClass = options.inactiveClass;
       updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
               caculateInactiveList($carouselElementList, activeListLength, activeElementIndex),
-              activeStyleList, activeZIndexList, activeClassList, inactiveStyle, inactiveClass, false, '');
-      $prev.on('click', function(e) {
+              activeStyleList, activeZIndexList, activeClassList, inactiveStyle, inactiveClass, false, null, null);
+      $prev.on('click', function prev(e) {
         e.preventDefault();
+        $prev.off('click', prev);
         var inactiveElementIndex = activeElementIndex + activeListCenter;
         if (inactiveElementIndex >= carouselLength) {
           inactiveElementIndex = inactiveElementIndex - carouselLength;
@@ -125,11 +151,13 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true);
+                inactiveStyle, inactiveClass, true, options.beforePrev,
+                function() {options.afterPrev(arguments); $prev.on('click', prev);});
       });
 
-      $next.on('click', function(e) {
+      $next.on('click', function next(e) {
         e.preventDefault();
+        $next.off('click', next);
         var inactiveElementIndex = activeElementIndex - activeListCenter;
         if (inactiveElementIndex < 0) {
           inactiveElementIndex = inactiveElementIndex + carouselLength;
@@ -142,7 +170,8 @@
 
         updateCarousel(caculateActiveList($carouselElementList, activeListLength, activeElementIndex), 
                 $carouselElementList.eq(inactiveElementIndex), activeStyleList, activeZIndexList, activeClassList, 
-                inactiveStyle, inactiveClass, true);
+                inactiveStyle, inactiveClass, true, options.beforeNext,
+                function() {options.afterNext(arguments); $next.on('click', next);});
 
       });
     });
